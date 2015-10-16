@@ -1,5 +1,7 @@
 class Mastermind
 	def initialize
+		@start_time = nil
+		@guess_counter = 0
 		hello
 	end
 
@@ -38,6 +40,7 @@ class Mastermind
 	end
 
 	def play
+		@start_time = Time.now
 		@sequence = generate_beginner
 
 		puts "I have generated a beginner sequence with four elements made up of:"
@@ -51,18 +54,41 @@ class Mastermind
 		puts "What's your guess?"
 
 		input = gets.chomp
-		input = parse_input(input)
-
-		if correct?(@sequence, input)
-			puts "Congratulations! You guessed the sequence #{@sequence.join} in X guesses over  X time."
+		if input == "c"
+			cheat
+		elsif input == "q"
+			quit
 		else
-			puts "nah breh"
+			if correct?(@sequence, input)
+				end_game
+			else
+				incorrect(input)
+			end
 		end
+	end
+
+	def incorrect(input)
+		@guess_counter += 1
+		puts "'#{input.upcase}' has X of the correct elements with X in the correct positions"
+		
+		if @guess_counter == 1
+			puts "You've taken #{@guess_counter} guess"
+		else
+			puts "You've taken #{@guess_counter} guesses"
+		end
+		# require 'pry' ; binding.pry
+		play_prompt
 	end
 
 	def cheat
 		p "The sequence is: #{@sequence.join}"
 		play_prompt
+	end
+
+	def end_game
+		@guess_counter += 1
+		@fin_time = Time.now
+		puts "Congratulations! You guessed the sequence #{@sequence.join} in #{@guess_counter} guesses over  #{@fin_time - @start_time} seconds."
 	end
 
 	def generate_beginner
@@ -73,18 +99,11 @@ class Mastermind
 	end
 
 	def parse_input(input)
-		input = input.downcase
-		if input == "c"
-			cheat
-		elsif input == "q"
-			quit
-		else
-			input.chars
-		end
+		input = input.downcase.chars
 	end
 
 	def correct?(sequence, input)
-		input == sequence
+		parse_input(input) == sequence
 	end
 
 
