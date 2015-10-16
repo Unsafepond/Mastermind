@@ -32,11 +32,11 @@ class Mastermind
 		puts "You type some stuff or something..."
 		puts "Press Enter To Continue!!!"
 		gets.chomp
-		prompt
+		starting_prompt
 	end
 
 	def quit
-		70.times { puts "GOODBYE!"}
+		70000.times { print "GOODBYE!"}
 	end
 
 	def play
@@ -69,7 +69,7 @@ class Mastermind
 
 	def incorrect(input)
 		@guess_counter += 1
-		puts "'#{input.upcase}' has X of the correct elements with X in the correct positions"
+		puts "'#{input.upcase}' has #{number_correct(input)} of the correct elements with #{position_correct(input)} in the correct positions"
 		
 		if @guess_counter == 1
 			puts "You've taken #{@guess_counter} guess"
@@ -80,6 +80,25 @@ class Mastermind
 		play_prompt
 	end
 
+	def number_correct(input)
+		number = 0 
+		input = parse_input(input)
+		@sequence.each do |char|
+			if input.any? { |ic| ic == char }
+				number += 1
+			end
+		end
+		return number
+	end
+
+	def position_correct(input)
+		input = parse_input(input)
+		correct = @sequence.select.with_index do |seq_char, index|
+			seq_char == input[index]
+		end
+		correct.count
+	end
+
 	def cheat
 		p "The sequence is: #{@sequence.join}"
 		play_prompt
@@ -88,7 +107,7 @@ class Mastermind
 	def end_game
 		@guess_counter += 1
 		@fin_time = Time.now
-		puts "Congratulations! You guessed the sequence #{@sequence.join} in #{@guess_counter} guesses over  #{@fin_time - @start_time} seconds."
+		puts "Congratulations! You guessed the sequence #{@sequence.join} in #{@guess_counter} guesses over  #{calc_time(@fin_time, @start_time)}"
 	end
 
 	def generate_beginner
@@ -106,6 +125,17 @@ class Mastermind
 		parse_input(input) == sequence
 	end
 
+	def calc_time(fin_time, start_time)
+		subt_time = fin_time - start_time
+
+		if subt_time < 60.00
+			return "#{subt_time.to_s.split(".").first} seconds."
+		else
+		split_min = (subt_time / 60).to_s.split(".").first
+		split_sec = (subt_time % 60).to_s.split(".").first
+		return "#{split_min} minutes and #{} seconds."
+		end
+	end
 
 end
 
